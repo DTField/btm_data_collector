@@ -1516,6 +1516,23 @@ class mcvc (object):
         excel_doc.direction = 'Input'
         excel_doc.datatype = dt.format('File')
         
+        # Export tifs
+        export = arcpy.Parameter()
+        export.name = 'Export TIF Files'
+        export.displayName = 'Export TIF Files?'
+        export.parameterType = 'Optional'
+        export.direction = 'Input'
+        export.datatype = dt.format('Boolean')
+        export.value = 'False'
+        
+        # Export Folder
+        expFold = arcpy.Parameter()
+        expFold.name = 'Export Folder'
+        expFold.displayName = 'Export Folder'
+        expFold.parameterType = 'Optional'
+        expFold.direction = 'Input'
+        expFold.datatype = dt.format('Folder')
+        
         # Clip DEMs
         clipDEM = arcpy.Parameter()
         clipDEM.name = 'Clip DEMs'
@@ -1550,19 +1567,37 @@ class mcvc (object):
         in_ortho.direction = 'Input'
         in_ortho.datatype = dt.format('File')
 
-        return [siteData, excel_doc, clipDEM, in_dem, clipOrtho, in_ortho] 
+        return [siteData, excel_doc, export, expFold, clipDEM, in_dem, clipOrtho, in_ortho] 
     
     def updateParameters(self, parameters):
+                
+        if parameters[2].value is True:
+            parameters[3].enabled = True
+        else:
+            parameters[3].enabled = False
+        
+        if parameters[4].value is True:
+            parameters[5].enabled = True
+        else:
+            parameters[5].enabled = False
+        
+        if parameters[6].value is True:
+            parameters[7].enabled = True
+        else:
+            parameters[7].enabled = False
                 
         return
         
     def updateMessages(self, parameters):
-        
+    
         if parameters[2].value is True and parameters[3].value is None:
-            parameters[3].setWarningMessage("Please select DEM to clip")
+            parameters[3].setWarningMessage("Please select a folder to export .TIF files to")
+        
+        if parameters[4].value is True and parameters[3].value is None:
+            parameters[5].setWarningMessage("Please select DEM to clip")
             
-        if parameters[4].value is True and parameters[5].value is None:
-            parameters[5].setWarningMessage("Please select Ortho to clip")
+        if parameters[6].value is True and parameters[5].value is None:
+            parameters[7].setWarningMessage("Please select Ortho to clip")
         
         return
     
@@ -1571,9 +1606,11 @@ class mcvc (object):
         mcvc.main(
             siteData=parameters[0].valueAsText,
             excel_doc=parameters[1].valueAsText,
-            clipDEM=parameters[2].value,
-            in_dem=parameters[3].valueAsText,
-            clipOrtho=parameters[4].value,
-            in_ortho=parameters[5].valueAsText
+            export=parameters[2].value,
+            expFold=parameters[3].valueAsText,
+            clipDEM=parameters[4].value,
+            in_dem=parameters[5].valueAsText,
+            clipOrtho=parameters[6].value,
+            in_ortho=parameters[7].valueAsText
             )
         return

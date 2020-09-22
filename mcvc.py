@@ -9,7 +9,7 @@ from . import ruggedness
 from . import surface_area_to_planar_area as SAPR
 
 
-def main(siteData=None, excel_doc=None, clipDEM=False, in_dem=None, clipOrtho=False, in_ortho=None):
+def main(siteData=None, excel_doc=None, export=False, expFold=None, clipDEM=False, in_dem=None, clipOrtho=False, in_ortho=None):
     
     arcpy.env.overwriteOutput = True
     arcpy.env.workspace = siteData
@@ -55,6 +55,20 @@ def main(siteData=None, excel_doc=None, clipDEM=False, in_dem=None, clipOrtho=Fa
                 
                 arcpy.Clip_management(in_ortho, str(ext), siteData + "//" + clipPoly + "_Ortho_Clip", clipPoly, "#", "ClippingGeometry")
             
+    except Exception as e:
+        utils.msg(e, mtype='error')
+        
+    
+    try:
+        
+        if export is True:
+            
+            clips = arcpy.ListRasters("*","ALL")
+            
+            for clip in clips:
+                if clip.endswith("Clip"):
+                    arcpy.RasterToOtherFormat_conversion(clip, expFold, "TIFF")
+        
     except Exception as e:
         utils.msg(e, mtype='error')
         
